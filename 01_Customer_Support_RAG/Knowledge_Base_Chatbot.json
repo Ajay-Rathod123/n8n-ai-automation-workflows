@@ -1,0 +1,181 @@
+{
+  "name": "Customer Support - Knowledge Base Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -608,
+        -32
+      ],
+      "id": "b1c5c59a-b582-410f-80db-e73ec88491fb",
+      "name": "When chat message received",
+      "webhookId": "62ea9db7-2210-4a4b-8244-74d914784617"
+    },
+    {
+      "parameters": {
+        "options": {
+          "systemPromptTemplate": "=You are an assistant for question-answering tasks. Use the following pieces of retrieved context to answer the question.\nIf you don't know the answer, just say that you don't know, don't try to make up an answer.\n----------------\nContext: {context}"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chainRetrievalQa",
+      "typeVersion": 1.7,
+      "position": [
+        -304,
+        -208
+      ],
+      "id": "3fe37672-9a77-45a9-929e-f9d2617cac99",
+      "name": "Question and Answer Chain"
+    },
+    {
+      "parameters": {
+        "model": "qwen3:1.7b",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOllama",
+      "typeVersion": 1,
+      "position": [
+        -384,
+        80
+      ],
+      "id": "a8bcddc2-9d9c-44ac-ac91-40e1dde699d8",
+      "name": "Ollama Chat Model",
+      "credentials": {
+        "ollamaApi": {
+          "id": "pFO9B31szpSlcPde",
+          "name": "Ollama account"
+        }
+      }
+    },
+    {
+      "parameters": {},
+      "type": "@n8n/n8n-nodes-langchain.retrieverVectorStore",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        -80
+      ],
+      "id": "9533a702-5d3c-4d44-bc75-871031e5870d",
+      "name": "Vector Store Retriever"
+    },
+    {
+      "parameters": {
+        "qdrantCollection": {
+          "__rl": true,
+          "value": "company_knowledge",
+          "mode": "list",
+          "cachedResultName": "company_knowledge"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreQdrant",
+      "typeVersion": 1.3,
+      "position": [
+        -208,
+        96
+      ],
+      "id": "f02f4fad-6edd-471d-bbbf-f9966e71d57b",
+      "name": "Qdrant Vector Store",
+      "credentials": {
+        "qdrantApi": {
+          "id": "SvP0sqN20k5IRCrc",
+          "name": "Qdrant account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "model": "nomic-embed-text:latest"
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOllama",
+      "typeVersion": 1,
+      "position": [
+        112,
+        240
+      ],
+      "id": "b28d1e41-0dcc-4a0e-a5f3-e78b4942f0c8",
+      "name": "Embeddings Ollama",
+      "credentials": {
+        "ollamaApi": {
+          "id": "pFO9B31szpSlcPde",
+          "name": "Ollama account"
+        }
+      }
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Ollama Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Retriever": {
+      "ai_retriever": [
+        [
+          {
+            "node": "Question and Answer Chain",
+            "type": "ai_retriever",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Qdrant Vector Store": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Retriever",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings Ollama": {
+      "ai_embedding": [
+        [
+          {
+            "node": "Qdrant Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "80aaf45e-f970-4ea0-b5b0-7ec127502b17",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "6cbdb9ab5baef364f1adf85ea34423356a6d5c2d0dc9ddecce1dbc34d729ee2f"
+  },
+  "nodeGroups": [],
+  "id": "VBPIOCPgTSEbFdaw",
+  "tags": []
+}
